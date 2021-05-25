@@ -150,6 +150,31 @@ public class GRDM_U3 implements PlugIn {
 				}
 			}
 			
+			// methode um Graustufen zu machen.
+			if (method.equals("Negativbild")) {
+
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						int pos = y * width + x;
+						int argb = origPixels[pos]; // Lesen der Originalwerte
+
+						int r = (argb >> 16) & 0xff;
+						int g = (argb >> 8) & 0xff;
+						int b = argb & 0xff;
+
+						int rn = 255 - r; // Farbwerte umkehren
+						int gn = 255 - g;
+						int bn = 255 - b;
+
+						// Hier muessen die neuen RGB-Werte wieder auf den Bereich von 0 bis 255
+						// begrenzt werden
+
+						pixels[pos] = (0xFF << 24) | (rn << 16) | (gn << 8) | bn;
+					}
+				}
+			}
+			
+			
 			
 			
 		}
