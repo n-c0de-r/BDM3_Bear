@@ -32,8 +32,8 @@ public class GRDM_U3_s0577683 implements PlugIn {
 	private int width;
 	private int height;
 
-	String[] items = { "Original", "Rot-Kanal", "Graustufen", "Negativ",
-			"Binär", "5 Graustufen", "10 Graustufen","Fehlerdiffusion", "Sepia" };
+	String[] items = { "Original", "Rot-Kanal", "Graustufen", "Negativ", "Binär", "5 Graustufen", "10 Graustufen",
+			"Fehlerdiffusion", "Sepia" };
 
 	public static void main(String args[]) {
 
@@ -196,10 +196,11 @@ public class GRDM_U3_s0577683 implements PlugIn {
 						// Schwellenbereich erzeugen, ähnlich der Streifen der USA Flagge
 						double schwelle = 255 / 4.0;
 
-						/* Grauwert durch Schwellenwert teilen und Ganzzahl berechnen.
-						 * Je nachdem entstehen werte zwischen 0 und 4 (5 Farben), die
-						 * wiederum multipliziert, mit dem Schwellenwert selbst, jeweils
-						 * ein vielfaches von 255/4 ergeben: 0, 63,25 ... 255.
+						/*
+						 * Grauwert durch Schwellenwert teilen und Ganzzahl berechnen. Je nachdem
+						 * entstehen werte zwischen 0 und 4 (5 Farben), die wiederum multipliziert, mit
+						 * dem Schwellenwert selbst, jeweils ein vielfaches von 255/4 ergeben: 0, 63,25
+						 * ... 255.
 						 */
 						gray = (int) ((int) (gray / schwelle) * schwelle);
 
@@ -207,35 +208,36 @@ public class GRDM_U3_s0577683 implements PlugIn {
 					}
 				}
 			}
-			
+
 			// Methode um 10 Graustufen zu machen.
-						if (method.equals("10 Graustufen")) {
+			if (method.equals("10 Graustufen")) {
 
-							for (int y = 0; y < height; y++) {
-								for (int x = 0; x < width; x++) {
-									int pos = y * width + x;
-									int argb = origPixels[pos]; // Lesen der Originalwerte
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						int pos = y * width + x;
+						int argb = origPixels[pos]; // Lesen der Originalwerte
 
-									int r = (argb >> 16) & 0xff;
-									int g = (argb >> 8) & 0xff;
-									int b = argb & 0xff;
-									// Durchschnitt berechnen
-									int gray = (r + g + b) / 3;
+						int r = (argb >> 16) & 0xff;
+						int g = (argb >> 8) & 0xff;
+						int b = argb & 0xff;
+						// Durchschnitt berechnen
+						int gray = (r + g + b) / 3;
 
-									// Schwellenbereich erzeugen, ähnlich der Streifen der USA Flagge
-									double schwelle = 255 / 9.0;
+						// Schwellenbereich erzeugen, ähnlich der Streifen der USA Flagge
+						double schwelle = 255 / 9.0;
 
-									/* Grauwert durch Schwellenwert teilen und Ganzzahl berechnen.
-									 * Je nachdem entstehen werte zwischen 0 und 9 (10 Farben), die
-									 * wiederum multipliziert, mit dem Schwellenwert selbst, jeweils
-									 * ein vielfaches von 255/4 ergeben: 0, 28, 56 ... 255.
-									 */
-									gray = (int) ((int) (gray / schwelle) * schwelle);
+						/*
+						 * Grauwert durch Schwellenwert teilen und Ganzzahl berechnen. Je nachdem
+						 * entstehen werte zwischen 0 und 9 (10 Farben), die wiederum multipliziert, mit
+						 * dem Schwellenwert selbst, jeweils ein vielfaches von 255/4 ergeben: 0, 28, 56
+						 * ... 255.
+						 */
+						gray = (int) ((int) (gray / schwelle) * schwelle);
 
-									pixels[pos] = (0xFF << 24) | (gray << 16) | (gray << 8) | gray;
-								}
-							}
-						}
+						pixels[pos] = (0xFF << 24) | (gray << 16) | (gray << 8) | gray;
+					}
+				}
+			}
 
 			// Methode um Binär zu machen.
 			if (method.equals("Binär")) {
@@ -278,18 +280,55 @@ public class GRDM_U3_s0577683 implements PlugIn {
 						// Durchschnitt berechnen
 						int gray = (r + g + b) / 3;
 
-						if (gray + error < 128) {
-							error = gray + error;
-						} else {
-							error = 255 - (gray - error);
-						}
-						gray += error;
-
 						// Wird der Schwellenwert überschritten, ist der Pixel weiß
 						if (gray > 128) {
 							pixels[pos] = (0xFF << 24) | (255 << 16) | (255 << 8) | 255;
 						} else { // sonst schwarz
 							pixels[pos] = (0xFF << 24) | (0 << 16) | (0 << 8) | 0;
+						}
+					}
+				}
+			}
+
+			// Methode um Fehlerdiffusion zu machen.
+			// Formel nach https://www.youtube.com/watch?v=0t8BHaLsXTM&t=255s
+			if (method.equals("Fehlerdiffusion")) {
+
+				for (int y = 0; y < height; y++) {
+					int error = 0;
+
+					for (int x = 0; x < width; x++) {
+						int pos = y * width + x;
+						int argb = origPixels[pos]; // Lesen der Originalwerte
+
+						int r = (argb >> 16) & 0xff;
+						int g = (argb >> 8) & 0xff;
+						int b = argb & 0xff;
+
+						// Durchschnitt berechnen
+						int gray = (r + g + b) / 3;
+
+						/*
+						 * Alter Code, nicht mehr korrekt
+						 * if (gray + error < 128) { 
+						 * error = gray +
+						 * error; 
+						 * } else { 
+						 * error = 255 - (gray - error); 
+						 * } gray += error;
+						 * ----------------------------------
+						 */
+
+						gray = gray + error;
+
+						// Wird der Schwellenwert überschritten, ist der Pixel weiß
+						// Fehlerzahl wird fortgeführt.
+						if (gray < 128) {
+							error = gray;
+							pixels[pos] = (0xFF << 24) | (0 << 16) | (0 << 8) | 0;
+						} else {
+							error = gray - 255;
+							pixels[pos] = (0xFF << 24) | (255 << 16) | (255 << 8) | 255;
 						}
 					}
 				}
