@@ -25,7 +25,7 @@ import javax.swing.event.ChangeListener;
 /**
  * Opens an image window and adds a panel below the image
  */
-public class GRDM_U3_s0577683 implements PlugIn {
+public class GRDM_U3 implements PlugIn {
 
 	ImagePlus imp; // ImagePlus object
 	private int[] origPixels;
@@ -40,7 +40,7 @@ public class GRDM_U3_s0577683 implements PlugIn {
 		IJ.open("bear.jpg");
 		// IJ.open("Z:/Pictures/Beispielbilder/orchid.jpg");
 
-		GRDM_U3_s0577683 pw = new GRDM_U3_s0577683();
+		GRDM_U3 pw = new GRDM_U3();
 		pw.imp = IJ.getImage();
 		pw.run("");
 	}
