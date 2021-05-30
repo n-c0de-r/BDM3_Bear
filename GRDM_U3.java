@@ -264,33 +264,6 @@ public class GRDM_U3_s0577683 implements PlugIn {
 			}
 
 			// Methode um Fehlerdiffusion zu machen.
-			if (method.equals("Fehlerdiffusion")) {
-
-				for (int y = 0; y < height; y++) {
-					int error = 0;
-
-					for (int x = 0; x < width; x++) {
-						int pos = y * width + x;
-						int argb = origPixels[pos]; // Lesen der Originalwerte
-
-						int r = (argb >> 16) & 0xff;
-						int g = (argb >> 8) & 0xff;
-						int b = argb & 0xff;
-
-						// Durchschnitt berechnen
-						int gray = (r + g + b) / 3;
-
-						// Wird der Schwellenwert überschritten, ist der Pixel weiß
-						if (gray > 128) {
-							pixels[pos] = (0xFF << 24) | (255 << 16) | (255 << 8) | 255;
-						} else { // sonst schwarz
-							pixels[pos] = (0xFF << 24) | (0 << 16) | (0 << 8) | 0;
-						}
-					}
-				}
-			}
-
-			// Methode um Fehlerdiffusion zu machen.
 			// Formel nach https://www.youtube.com/watch?v=0t8BHaLsXTM&t=255s
 			if (method.equals("Fehlerdiffusion")) {
 
