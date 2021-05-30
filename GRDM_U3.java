@@ -33,7 +33,7 @@ public class GRDM_U3_s0577683 implements PlugIn {
 	private int height;
 
 	String[] items = { "Original", "Rot-Kanal", "Graustufen", "Negativ", "Binär", "5 Graustufen", "10 Graustufen",
-			"Fehlerdiffusion", "Sepia" };
+			"Fehlerdiffusion", "Sepia", "6 Farben" };
 
 	public static void main(String args[]) {
 
@@ -146,7 +146,7 @@ public class GRDM_U3_s0577683 implements PlugIn {
 					for (int x = 0; x < width; x++) {
 						int pos = y * width + x;
 						int argb = origPixels[pos]; // Lesen der Originalwerte
-
+						
 						int r = (argb >> 16) & 0xff;
 						int g = (argb >> 8) & 0xff;
 						int b = argb & 0xff;
@@ -309,13 +309,8 @@ public class GRDM_U3_s0577683 implements PlugIn {
 						int gray = (r + g + b) / 3;
 
 						/*
-						 * Alter Code, nicht mehr korrekt
-						 * if (gray + error < 128) { 
-						 * error = gray +
-						 * error; 
-						 * } else { 
-						 * error = 255 - (gray - error); 
-						 * } gray += error;
+						 * Alter Code, nicht mehr korrekt if (gray + error < 128) { error = gray +
+						 * error; } else { error = 255 - (gray - error); } gray += error;
 						 * ----------------------------------
 						 */
 
@@ -364,6 +359,54 @@ public class GRDM_U3_s0577683 implements PlugIn {
 						bn = Math.min(255, Math.max(0, bn));
 
 						pixels[pos] = (0xFF << 24) | (rn << 16) | (gn << 8) | bn;
+					}
+				}
+			}
+
+			// Methode um 6 Farben zu machen.
+			if (method.equals("6 Farben")) {
+				//6 Farben aus dem Beispielbild in Hexnotation.
+				int[] six_colors = {0x665A51,0x222524, 0x9E9086, 0x2E6489, 0xD1CFD0, 0x6996A2};
+				
+				double maxDist;
+				double minDist;
+
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						int pos = y * width + x;
+						int argb = origPixels[pos]; // Lesen der Originalwerte
+
+						int r = (argb >> 16) & 0xff;
+						int g = (argb >> 8) & 0xff;
+						int b = argb & 0xff;
+
+						//Distanz auf Maximum setzen
+						maxDist = Math.sqrt(Math.pow(255,2)*3);
+
+						for (int c : six_colors) {
+							int red = (c >> 16) & 0xff;
+							int grn = (c >> 8) & 0xff;
+							int blu = c  & 0xff;
+							
+							//Distanz zwischen Pixel und aktueller Farbe berechnen
+							minDist = Math.sqrt(Math.pow(red-r, 2) + Math.pow(grn-g, 2) + Math.pow(blu-b, 2));
+							/*
+							 * Wenn die neue Distanz kleiner ist (unser Ziel!), dann diese als neues Maximum übernehmen
+							 * (evtl ist die nächste Farbe kleiner) und schon mal auf den Pixel anwenden, bis eine 
+							 * bessere Farbe gefunden wird, die dann die neue Obergrence bildet.
+							 */
+							if (maxDist > minDist) {
+								maxDist = minDist;
+								//Sobald die kleinste Distanz gefunden ist, die Farbwerte schreiben.
+								pixels[pos] = (0xFF << 24) | (red << 16) | (grn << 8) | blu;
+							}
+						}
+						
+						int rn;
+						int gn;
+						int bn;
+
+						//pixels[pos] = (0xFF << 24) | (rn << 16) | (gn << 8) | bn;
 					}
 				}
 			}
