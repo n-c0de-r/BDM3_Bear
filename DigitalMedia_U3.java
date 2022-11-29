@@ -25,7 +25,7 @@ import javax.swing.event.ChangeListener;
 /**
  * Opens an image window and adds a panel below the image
  */
-public class GRDM_U3 implements PlugIn {
+public class DigitalMedia_U3 implements PlugIn {
 
 	ImagePlus imp; // ImagePlus object
 	private int[] origPixels;
@@ -38,9 +38,8 @@ public class GRDM_U3 implements PlugIn {
 	public static void main(String args[]) {
 
 		IJ.open("bear.jpg");
-		// IJ.open("Z:/Pictures/Beispielbilder/orchid.jpg");
 
-		GRDM_U3 pw = new GRDM_U3();
+		DigitalMedia_U3 pw = new DigitalMedia_U3();
 		pw.imp = IJ.getImage();
 		pw.run("");
 	}
@@ -359,7 +358,7 @@ public class GRDM_U3 implements PlugIn {
 						for (int c : six_colors) {
 							int red = (c >> 16) & 0xff;
 							int grn = (c >> 8) & 0xff;
-							int blu = c  & 0xff;
+							int blu =  c  & 0xff;
 							
 							//Distanz zwischen Pixel und aktueller Farbe berechnen
 							minDist = Math.sqrt(Math.pow(red-r, 2) + Math.pow(grn-g, 2) + Math.pow(blu-b, 2));
@@ -374,12 +373,6 @@ public class GRDM_U3 implements PlugIn {
 								pixels[pos] = (0xFF << 24) | (red << 16) | (grn << 8) | blu;
 							}
 						}
-						
-						int rn;
-						int gn;
-						int bn;
-
-						//pixels[pos] = (0xFF << 24) | (rn << 16) | (gn << 8) | bn;
 					}
 				}
 			}
